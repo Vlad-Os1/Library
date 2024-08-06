@@ -11,6 +11,7 @@
 
 body {
   font-family: "Montserrat";
+  background-color: #f0f0f0;
 }
 
 svg {
@@ -24,6 +25,7 @@ h1 {
 
 .header {
   position: sticky;
+  top: 0%;
   height: 100px;
   width: 100%;
   display: flex;
@@ -31,12 +33,37 @@ h1 {
   align-items: center;
   background-color: coral;
   color: white;
+  box-shadow: 0px -2px 10px black;
 }
 
 .container {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.modal-button-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 35px 0px;
+}
+
+.modal-button {
+  background-color: rgb(255, 127, 80);
+  color: white;
+  border: none;
+  border-radius: 15px;
+  padding: 10px 15px;
+  cursor: pointer;
+  height: 50px;
+  width: 150px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.modal-button:hover {
+  background-color: rgb(182, 90, 56);
 }
 
 /* Modal Styles */
@@ -46,11 +73,12 @@ h1 {
   left: 50%;
   transform: translate(-50%, -50%) scale(0);
   transition: 200ms ease-in-out;
-  border: 1px solid black;
+  border: none;
   border-radius: 10px;
   z-index: 10;
-  background-color: white;
-  width: min(500px, 80%);
+  background-color: #f0f0f0;
+  padding: 10px 15px;
+  /* width: min(300px, 80%); */
 }
 
 .modal.active {
@@ -61,7 +89,6 @@ h1 {
   padding: 10px 15px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
   border-bottom: 1px solid black;
 }
 
@@ -80,7 +107,43 @@ h1 {
 }
 
 .modal-body {
-  padding: 10px 15px;
+  padding: 20px 30px;
+}
+
+.modal-body form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  
+  gap: 20px;
+}
+
+form input[type=text], form input[type=number]{
+  padding: 10px;
+  border: 1px solid rgb(0, 0, 0, 0.2);
+  border-radius: 5px;
+  outline: none;
+  width: 100%;
+  font-size: 1rem;
+}
+
+.isRead label {
+  font-weight: 600;
+}
+
+form button {
+  background-color: black;
+  color: white;
+  cursor: pointer;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 40px;
+  font-weight: 600;
+  transition: 200ms ease;
+}
+
+form button:hover {
+  background-color: #7a7a7a;
 }
 
 #overlay {

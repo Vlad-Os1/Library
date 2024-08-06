@@ -13,7 +13,9 @@
         <h1>Library</h1>
       </div>
     </div>
-    <button data-modal-target="#modal">Open Modal</button>
+    <div class="modal-button-wrapper">
+      <button data-modal-target="#modal" class="modal-button">Add Book</button>
+    </div>    
     <div class="modal" id="modal">
       <div class="modal-header">
         <div class="title">Add New Book</div>
@@ -21,13 +23,14 @@
       </div>
       <div class="modal-body">
         <form action="">
-          <input type="text" id="title">
-          <input type="text" id="author"> 
-          <input type="text" id="pages">
+          <input type="text" id="title" placeholder="Title" maxlength="50" required>
+          <input type="text" id="author" placeholder="Author" maxlength="50" required> 
+          <input type="number" id="pages" placeholder="Pages" min="0" max="10000" required>
           <div class="isRead">
             <label for="isRead">Have you read it ?</label>
             <input type="checkbox" id="isRead">
           </div> 
+          <button class="btn" type="submit">Submit</button>
         </form>
       </div>
     </div>
