@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="header">
+      <div class="container">
+        <svg  viewBox="0 0 24 24" id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg"><defs><style>.cls-1{fill:none;stroke:#fff;stroke-miterlimit:10;stroke-width:1.91px;}</style></defs><rect class="cls-1" x="7.23" y="5.32" width="9.55" height="3.82"/><path class="cls-1" d="M20.59,22.5H5.32A1.91,1.91,0,0,1,4,19.24a1.89,1.89,0,0,1,1.35-.56H20.59"/><line class="cls-1" x1="19.64" y1="18.68" x2="19.64" y2="22.5"/><path class="cls-1" d="M20.59,1.5V18.68H5.32a1.91,1.91,0,0,0-1.91,1.91V3.41A1.92,1.92,0,0,1,5.32,1.5Z"/></svg>
+        <h1>Library</h1>
+      </div>
+    </div>
+    <button data-modal-target="#modal">Open Modal</button>
+    <div class="modal" id="modal">
+      <div class="modal-header">
+        <div class="title">Add New Book</div>
+        <button data-close-button class="close-button">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form action="">
+          <input type="text" id="title">
+          <input type="text" id="author"> 
+          <input type="text" id="pages">
+          <div class="isRead">
+            <label for="isRead">Have you read it ?</label>
+            <input type="checkbox" id="isRead">
+          </div> 
+        </form>
+      </div>
+    </div>
+    <div class="main-container"></div>
+    <div class="footer"></div>
+    <div class="overlay" id="overlay"></div>
+    <script src="script.js"></script>
+  </body>
+</html>
