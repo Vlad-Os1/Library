@@ -8,22 +8,27 @@
   </head>
   <body>
     <div class="header">
-      <div class="container">
+      <div class="header-content">
         <svg  viewBox="0 0 24 24" id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg"><defs><style>.cls-1{fill:none;stroke:#fff;stroke-miterlimit:10;stroke-width:1.91px;}</style></defs><rect class="cls-1" x="7.23" y="5.32" width="9.55" height="3.82"/><path class="cls-1" d="M20.59,22.5H5.32A1.91,1.91,0,0,1,4,19.24a1.89,1.89,0,0,1,1.35-.56H20.59"/><line class="cls-1" x1="19.64" y1="18.68" x2="19.64" y2="22.5"/><path class="cls-1" d="M20.59,1.5V18.68H5.32a1.91,1.91,0,0,0-1.91,1.91V3.41A1.92,1.92,0,0,1,5.32,1.5Z"/></svg>
         <h1>Library</h1>
       </div>
     </div>
-    <div class="modal-button-wrapper">
-      <button data-modal-target="#modal" class="modal-button">Add Book</button>
-    </div>    
+    <div class="main-container">
+      <div class="modal-button-wrapper">
+        <button data-modal-target="#modal" class="modal-button">Add Book</button>
+      </div>     
+      <div class="main-content">
+      </div>
+    </div>
     <div class="modal" id="modal">
       <div class="modal-header">
-        <div class="title">Add New Book</div>
+        <div class="modal-header-title">Add New Book</div>
         <button data-close-button class="close-button">&times;</button>
       </div>
       <div class="modal-body">
-        <form action="">
+        <form action="" id="bookForm">
           <input type="text" id="title" placeholder="Title" maxlength="50" required>
+          <p id="errorMsg" class="errorMsg">This book is already in your library</p>
           <input type="text" id="author" placeholder="Author" maxlength="50" required> 
           <input type="number" id="pages" placeholder="Pages" min="0" max="10000" required>
           <div class="isRead">
@@ -34,7 +39,6 @@
         </form>
       </div>
     </div>
-    <div class="main-container"></div>
     <div class="footer"></div>
     <div class="overlay" id="overlay"></div>
     <script src="script.js"></script>
