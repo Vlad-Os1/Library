@@ -63,9 +63,6 @@ class Storage {
 
   loadBooks() {
     const storedBooks = JSON.parse(localStorage.getItem(this.storageKey)) || [];
-    // console.log(storedBooks)
-    // let subject = storedBooks.map(book => new Book(book.title, book.author, book.pages, book.isRead, book.id)); 
-    // console.log(subject);
     return storedBooks.map(book => new Book(book.title, book.author, book.pages, book.isRead, book.id));
   }
 
