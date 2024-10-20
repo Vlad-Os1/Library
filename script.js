@@ -1,14 +1,14 @@
-class Book{
-  constructor (title, author, pages, isRead){
+class Book {
+  constructor (title, author, pages, isRead, id = null){
     this.title = title;
     this.author = author;
     this.pages = pages;
     this.isRead = isRead;
-    this.id = this.generateUniqueID();
+    this.id = id || this.generateUniqueID();
   }
 
   toggleReadStatus(){
-    this.isRead = !this.isRead
+    this.isRead = !this.isRead;
   }
 
   generateUniqueID(){
@@ -16,22 +16,21 @@ class Book{
   }
 }
 
-class Library{
-  constructor(){
-    this.books = [];
-    this.bookElements = {};
-
-    this.handleBookContainerClick = this.#handleBookContainerClick.bind(this);
-    this.handleBookFormSubmit = this.#handleBookFormSubmit.bind(this);
-     
-    this.#init();
+class Library {
+  constructor(storage){
+    this.storage = storage;
+    this.books = this.storage.loadBooks() || [];
   }
 
   isInLibrary(book) {
     return this.books.some(existingBook => existingBook.title === book.title);
   }
 
-  getBook(title) {
+  getBook(id) {
+    return this.books.find((book) => book.id === id);
+  }
+
+  getBookByTitle(title) {
     return this.books.find((book) => book.title === title);
   }
 
@@ -39,108 +38,147 @@ class Library{
     const newBook = new Book(title, author, pages, isRead);
     if (!this.isInLibrary(newBook)) {
       this.books.push(newBook);
-      this.#renderBook(newBook);
+      this.storage.saveBooks(this.books);
     }
   }
 
-  #renderBook(book) {
-    if(!book.id) return
+  removeBook(bookId) {
+    this.books = this.books.filter(book => book.id !== bookId);
+    this.storage.saveBooks(this.books);
+  }
+
+  toggleReadStatus(bookId) {
+    let book = this.books.find(book => book.id === bookId);
+    if(book){
+      book.toggleReadStatus();
+      this.storage.saveBooks(this.books);
+    }
+  }
+}   
+
+class Storage {
+  constructor(storageKey = "library.books") {
+    this.storageKey = storageKey;
+  }
+
+  loadBooks() {
+    const storedBooks = JSON.parse(localStorage.getItem(this.storageKey)) || [];
+    // console.log(storedBooks)
+    // let subject = storedBooks.map(book => new Book(book.title, book.author, book.pages, book.isRead, book.id)); 
+    // console.log(subject);
+    return storedBooks.map(book => new Book(book.title, book.author, book.pages, book.isRead, book.id));
+  }
+
+  saveBooks(books){
+    localStorage.setItem(this.storageKey, JSON.stringify(books));
+  }
+}
+
+class UI {
+  constructor(library) {
+    this.library = library;
+    this.bookElements = {};
+    this.handleBookContainerClick = this.#handleBookContainerClick.bind(this);
+    this.init();
+  }
+
+  init() {
+    const bookContainer = document.querySelector(".main-content");  
+    bookContainer.addEventListener("click", this.handleBookContainerClick);
+  }
+
+  renderBook(book) {
     const bookContainer = document.querySelector(".main-content");
     const card = document.createElement("div");
     card.className = "main-card";
-    
+
     card.innerHTML = `
       <p>${book.title}</p>
       <p>${book.author}</p>
       <p>${book.pages}</p>
       <div class="card-buttons">
-        <button class="readBtn ${book.isRead ? "isRead" : "notRead"}" >${book.isRead ? "Read" : "Not Read"}</button>
+        <button class="readBtn ${book.isRead ? "isRead" : "notRead"}">${book.isRead ? "Read" : "Not Read"}</button>
         <button class="removeBtn">Remove</button>
-      </div>`;
-    
+      </div>
+    `;
     bookContainer.appendChild(card);
     this.bookElements[book.id] = card;
   }
 
-  removeBook(bookId) {
-    const index = this.books.findIndex(book => book.id === bookId);
-    if (index !== -1) {
-      this.books.splice(index, 1);
-    }
-  
-    let cardToRemove = this.bookElements[bookId];
-    if (cardToRemove) {
-      cardToRemove.remove();
+  removeBookFromUI(bookId) {
+    const card = this.bookElements[bookId];
+    if (card) {
+      card.remove();
       delete this.bookElements[bookId];
     }
   }
 
-  changeIsRead(bookId) {
-    let book = this.books.find(book => book.id === bookId);
-    if(book){
-      book.toggleReadStatus();
+  updateReadStatus(bookId, isRead) {
+    const card = this.bookElements[bookId];
+    if (card) {
+      const readBtn = card.querySelector(".readBtn");
+      readBtn.textContent = isRead ? "Read" : "Not Read";
+      readBtn.classList.toggle("isRead", isRead);
+      readBtn.classList.toggle("notRead", !isRead);
     }
-  
-    let card = this.bookElements[bookId];
-    let readBtn = card.querySelector(".readBtn");
-  
-    if (book.isRead) {
-      readBtn.textContent = "Read";
-      readBtn.classList.add("isRead");
-      readBtn.classList.remove("notRead");
-    } else {
-      readBtn.textContent = "Not Read";
-      readBtn.classList.add("notRead");
-      readBtn.classList.remove("isRead");
-    }
-  }
-
-  #init(){
-    const bookContainer = document.querySelector(".main-content");
-    const bookForm = document.getElementById("bookForm");
-
-    bookContainer.removeEventListener("click", this.handleBookContainerClick);
-    bookForm.removeEventListener("submit", this.handleBookFormSubmit);
-
-    bookContainer.addEventListener("click", this.handleBookContainerClick);
-    bookForm.addEventListener("submit", this.handleBookFormSubmit);
   }
 
   #handleBookContainerClick(event) {
-    let card = event.target.closest(".main-card");
-    let bookId = Object.keys(this.bookElements).find(id => this.bookElements[id] === card);
+    const card = event.target.closest(".main-card");
+    const bookId = Object.keys(this.bookElements).find(id => this.bookElements[id] === card);
     if (event.target.classList.contains("removeBtn")) {
-      this.removeBook(bookId);
+      this.library.removeBook(bookId);
+      this.removeBookFromUI(bookId);
     } else if (event.target.classList.contains("readBtn")) {
-      this.changeIsRead(bookId);
+      this.library.toggleReadStatus(bookId);
+      this.updateReadStatus(bookId, this.library.getBook(bookId).isRead);
     }
+  }
+}
+
+class Form {
+  constructor(library, ui) {
+    this.library = library;
+    this.ui = ui;
+    this.form = document.getElementById("bookForm");
+    this.errorMsg = document.getElementById("errorMsg");
+    this.modal = document.getElementById("modal");
+    this.overlay = document.getElementById("overlay");
+    this.handleBookFormSubmit = this.#handleBookFormSubmit.bind(this);
+    
+    this.init();
+  }
+
+  init() {
+    this.form.addEventListener("submit", this.handleBookFormSubmit);
   }
 
   #handleBookFormSubmit(event) {
     event.preventDefault();
-    let errorMsg = document.getElementById("errorMsg");
+    
+    const title = document.getElementById("title").value;
+    const author = document.getElementById("author").value;
+    const pages = document.getElementById("pages").value;
+    const isRead = document.getElementById("isRead").checked;
 
-    const title = document.getElementById("title");
-    const author = document.getElementById("author");
-    const pages = document.getElementById("pages");
-    const isRead = document.getElementById("isRead");
-    const modal = document.getElementById("modal")
-    const overlay = document.getElementById("overlay")
-
-    if (this.getBook(title.value)) {
-      errorMsg.classList.add("active");
+    if (this.library.getBookByTitle(title)) {
+      this.errorMsg.classList.add("active");
       return;
     }
-    errorMsg.classList.remove("active");
 
-    this.addBookToLibrary(title.value, author.value, pages.value, isRead.checked);
-    bookForm.reset();
-    modal.classList.remove("active");
-    overlay.classList.remove("active");
+    this.errorMsg.classList.remove("active");
+
+    this.library.addBookToLibrary(title, author, pages, isRead);
+    const newBook = this.library.getBookByTitle(title);
+    this.ui.renderBook(newBook);  
+
+    this.form.reset();
+    this.modal.classList.remove("active");
+    this.overlay.classList.remove("active");
   }
 }
 
-class Modal{
+class Modal {
   constructor(){
     this.overlay = document.getElementById("overlay");
     this.init();
@@ -156,7 +194,7 @@ class Modal{
         this.openModal(modal);
       })
     })
-    overlay.addEventListener("click", () => {
+    this.overlay.addEventListener("click", () => {
       const modals = document.querySelectorAll(".modal.active")
       modals.forEach(modal => {
         this.closeModal(modal);
@@ -179,29 +217,16 @@ class Modal{
     if (modal == null) return
     modal.classList.remove("active")
     this.overlay.classList.remove("active")
-    
-    document.getElementById("bookForm").reset();
   }
 }
 
-const library = new Library();
-const modal = new Modal();
+document.addEventListener("DOMContentLoaded", () => {
+  const storage = new Storage();
+  const library = new Library(storage);
+  const ui = new UI(library);
+  const form = new Form(library, ui);
+  const modal = new Modal();
 
-const DEFAULT_DATA = [
-  {
-    title: "1984",
-    author: "George Orwell",
-    pages: 328,
-    isRead: true,
-  },
-  {
-    title: "Fahrenheit 451",
-    author: "Ray Bradbury",
-    pages: 	156,
-    isRead: false,
-  }
-]
-DEFAULT_DATA.forEach(book => {
-  library.addBookToLibrary(book.title, book.author, book.pages, book.isRead); 
+  library.books.forEach(book => ui.renderBook(book));
 });
 
